@@ -6,14 +6,17 @@ pep8fix is a tool to automatically correct a bunch of errors raised when using t
 Requirements
 ============
 
-pep8fix requires pep8 to be used.
+pep8fix requires pep8 to work.
+
+You can download pep8 from pypi here: http://pypi.python.org/pypi/pep8
 
 Usage
 =====
 
-To use pep8fix, you'll need to first install pep8. Once installed, you can view each of the errors in a file via `pep8 myfile.py`. To fix them, simply pipe the output of pep8 into pep8fix as follows: `pep8 myfile.py | python pep8fix.py`.
+To use pep8fix, you'll need to first install pep8. Once installed, you can use pep8 to view the style errors in a file via `pep8 *.py`. To fix them, simply pipe the output of pep8 into pep8fix: `pep8 *.py | python pep8fix.py`.
 
-pep8fix will then fix each of the errors and report the changes by printing the before and after lines it modifies. You can check them to ensure nothing catastrophic has happened. While pep8fix is intended not to break anything, it may be wise to make backups before running the script.
+pep8fix will then fix each of the errors and report the changes by printing  each line it's changed before and after modification. You can inspect the changes to ensure nothing catastrophic has happened.
+
 
     19:26:05 ~/Desktop/pep8fix$ pep8 cis192turnin.py 
     cis192turnin.py:8:3: E111 indentation is not a multiple of four
@@ -33,7 +36,14 @@ pep8fix will then fix each of the errors and report the changes by printing the 
     cis192turnin.py:8:3: E111 indentation is not a multiple of four
     cis192turnin.py:40:80: E501 line too long (110 characters)
 
-Note that pep8fix may not catch all of the errors on a single run. The script will only fix the errors that is sees from `pep8`. It's useful to run pep8 again to ensure no new style mistakes were uncovered.
+Note that pep8fix may not catch all of the errors on a single run. The script will only fix the errors that is sees from running pep8. It's usually useful to run pep8 again to ensure no new style mistakes were uncovered.
+
+Lastly, it's worth nothing that while many style changes can be automated, not all can. Some errors will always require a human to make correct them.
+
+Warning
+-------
+
+While pep8fix is intended to only improve style, as a general note of caution, it may be wise to make backups (or commits) before running the script.
 
 Contributors
 ============
