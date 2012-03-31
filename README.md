@@ -15,6 +15,16 @@ To use pep8fix, you'll need to first install pep8. Once installed, you can view 
 
 pep8fix will then fix each of the errors and report the changes by printing the before and after lines it modifies. You can check them to ensure nothing catastrophic has happened. While pep8fix is intended not to break anything, it may be wise to make backups before running the script.
 
+    19:26:09 ~/Desktop/pep8fix$ pep8 cis192turnin.py | python pep8fix.py 
+    cis192turnin.py:8:3: E111 indentation is not a multiple of four
+    cis192turnin.py:10:1: W293 blank line contains whitespace
+    '  \n'
+    '\n'
+    cis192turnin.py:40:80: E501 line too long (110 characters)
+    cis192turnin.py:57:16: E261 at least two spaces before inline comment
+    '    raw_input() # pause\n'
+    '    raw_input()  # pause\n'
+
 Note that pep8fix may not catch all of the errors on a single run. The script will only fix the errors that is sees from `pep8`. It's useful to run pep8 again to ensure no new style mistakes were uncovered.
 
 Contributors
