@@ -24,6 +24,9 @@ pep8fix will then fix each of the errors and report the changes by printing the 
     cis192turnin.py:57:16: E261 at least two spaces before inline comment
     '    raw_input() # pause\n'
     '    raw_input()  # pause\n'
+    19:27:30 ~/Desktop/pep8fix$ pep8 cis192turnin.py 
+    cis192turnin.py:8:3: E111 indentation is not a multiple of four
+    cis192turnin.py:40:80: E501 line too long (110 characters)
 
 Note that pep8fix may not catch all of the errors on a single run. The script will only fix the errors that is sees from `pep8`. It's useful to run pep8 again to ensure no new style mistakes were uncovered.
 
