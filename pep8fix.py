@@ -39,6 +39,18 @@ def parse_location(location):
     return loc
 
 
+CODES = {}
+
+
+class Fix(object):
+    def __init__(self, issue):
+        self.issue = issue
+
+    def __call__(self, func):
+        CODES[self.issue] = func
+
+
+@Fix('E261')
 def e261(swp, line):
     """Fix at least two spaces before inline comment"""
     print repr(line)
@@ -48,6 +60,7 @@ def e261(swp, line):
     swp.write(fix)
 
 
+@Fix('E262')
 def e262(swp, line):
     """Fix inline comment should start with '# '"""
     print repr(line)
@@ -57,6 +70,7 @@ def e262(swp, line):
     swp.write(fix)
 
 
+@Fix('E302')
 def e302(swp, line):
     """Fix expected 2 lines, found 1."""
     print repr(line)
@@ -65,6 +79,16 @@ def e302(swp, line):
     swp.write(fix)
 
 
+@Fix('W191')
+def w191(swp, line):
+    """Fix W191 indentation contains tabs."""
+    print repr(line)
+    fix = line.replace("\t", " " * 8)
+    print repr(fix)
+    swp.write(fix)
+
+
+@Fix('W291')
 def w291(swp, line):
     """Fix trailing whitespace."""
     print repr(line)
@@ -73,21 +97,13 @@ def w291(swp, line):
     swp.write(fix)
 
 
+@Fix('W293')
 def w293(swp, line):
     """Fix blank line contains whitespace."""
     print repr(line)
     fix = "\n"
     print repr(fix)
     swp.write(fix)
-
-
-CODES = {
-        'E261': e261,
-        'E262': e262,
-        'E302': e302,
-        'W291': w291,
-        'W293': w293
-        }
 
 
 def main():
