@@ -36,7 +36,7 @@ def e261(swp, line):
 def e262(swp, line):
     """Fix inline comment should start with '# '"""
     print repr(line)
-    i = line.index("#") + 1 
+    i = line.index("#") + 1
     fix = line[:i] + " " + line[i:]
     print repr(fix)
     swp.write(fix)
@@ -47,15 +47,6 @@ def e302(swp, line):
     """Fix expected 2 lines, found 1."""
     print repr(line)
     fix = "\n" + line
-    print repr(fix)
-    swp.write(fix)
-
-
-@Fix('W191')
-def w191(swp, line):
-    """Fix W191 indentation contains tabs."""
-    print repr(line)
-    fix = line.replace("\t", " " * 8)
     print repr(fix)
     swp.write(fix)
 
