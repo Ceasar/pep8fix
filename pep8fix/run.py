@@ -24,6 +24,7 @@ def parse_location(location):
 
 
 def main():
+    print "running"
     for line in sys.stdin:
         print line.strip()
         tokens = line.split()
@@ -39,6 +40,4 @@ def main():
     return 0
 
 if __name__ == "__main__":
-    import doctest
-    doctest.testmod()
     sys.exit(main())

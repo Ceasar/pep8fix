@@ -17,6 +17,6 @@ class swap(file):
 
     def __exit__(self, type, value, traceback):
         super(swap, self).__exit__(type, value, traceback)
-        if traceback is None: #Copies the content if no exception was thrown
+        if traceback is None:  # Copies the content if no exception was thrown
             shutil.copyfile(self.name, self.prime_name)
         os.remove(self.name)
