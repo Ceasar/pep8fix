@@ -1,36 +1,29 @@
+from functools import wraps
 import re
+
+from pep8 import BINARY_OPERATORS
 
 
 CODES = {}
 
 
-class Fix(object):
-    def __init__(self, issue):
-        self.issue = issue
-
-    def __call__(self, func):
+def fixes(code):
+    def wrapper(func):
+        @wraps(func)
         def fix(swp, line):
             print repr(line)
             fix = func(line)
             print repr(fix)
             swp.write(fix)
-        CODES[self.issue] = fix
+        CODES[code] = fix
+        fix.func = func
+    return wrapper
 
 
-# be careful with ordering since first match is returned
-_OPERATORS = (
-    '<<', '<=', '<',
-    '>=', '>',
-    '\+=', '-=', '==', '!=', '=',
-    '\*\*', '\*',
-    '//', '/',
-    '\+', '-', '%', '&', '\^', '~', '\|')
-
-
-@Fix('E225')
+@fixes('E225')
 def e225(line):
-    """Fix missing whitespace around operator."""
-    for operator in _OPERATORS:
+    """fixes missing whitespace around operator."""
+    for operator in BINARY_OPERATORS:
         pattern = "(\S)(%s)(\S)" % operator
         match = re.search(pattern, line)
         if match is None:
@@ -48,61 +41,61 @@ def e225(line):
             return line.replace(match.group(), "%s %s %s" % match.groups())
 
 
-@Fix('E231')
+@fixes('E231')
 def e231(line):
-    """Fix missing white space after ','"""
+    """fixes missing white space after ','"""
     tokens = re.split(",(\S)", line)
     return "".join(", ".join(tokens[i:i + 2]) for i in range(0, len(tokens), 2))
 
 
-@Fix('E261')
+@fixes('E261')
 def e261(line):
-    """Fix at least two spaces before inline comment"""
-    i = line.index("#")
+    """fixes at least two spaces before inline comment"""
+    i = line.rfind("#")
     return line[:i] + " " + line[i:]
 
 
-@Fix('E262')
+@fixes('E262')
 def e262(line):
-    """Fix inline comment should start with '# '"""
-    i = line.index("#") + 1
+    """fixes inline comment should start with '# '"""
+    i = line.rfind("#") + 1
     return line[:i] + " " + line[i:]
 
 
-@Fix('E302')
+@fixes('E302')
 def e302(line):
-    """Fix expected 2 lines, found 1."""
+    """fixes expected 2 lines, found 1."""
     return "\n" + line
 
 
-# @Fix('E303')
+# @fixes('E303')
 def e303(line):
-    """Fix too many blank lines (2)"""
+    """fixes too many blank lines (2)"""
     return ""
 
 
-# @Fix('E701')
+# @fixes('E701')
 def e701(line):
-    """Fix multiple statements on one line (colon)"""
+    """fixes multiple statements on one line (colon)"""
     i = line.index(":")
     return line[:i] + "\n" + line[i:]
 
 
-@Fix('W191')
+@fixes('W191')
 def w191(line):
-    """Fix W191 indentation contains tabs."""
+    """fixes W191 indentation contains tabs."""
     return line.expandtabs()
 
 
-@Fix('W291')
+@fixes('W291')
 def w291(line):
-    """Fix trailing whitespace."""
+    """fixes trailing whitespace."""
     return line.rstrip() + "\n"
 
 
-@Fix('W293')
+@fixes('W293')
 def w293(line):
-    """Fix blank line contains whitespace."""
+    """fixes blank line contains whitespace."""
     return "\n"
 
 
