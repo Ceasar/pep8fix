@@ -16,6 +16,13 @@ class Error(object):
         self.code = code
         self.msg = msg
 
+    def correct(self, line):
+        """Correct the mistake on the line."""
+        try:
+            return getattr(fixes, self.code.lower())(line)
+        except AttributeError:
+            raise ValueError("No solution known.")
+
     def __str__(self):
         return "%s:%s:%s: %s %s" % (self.filename, self.line, self.cursor, self.code, self.msg)
 
@@ -57,21 +64,18 @@ def fix_file(filename, errors):
                 try:
                     error = line_errors[i + 1]
                 except KeyError:
-                    continue
+                    swp.write(line)
                 else:
                     print error
+                    print repr(line)
                     # Can we fix it?
-                    code = error.code.lower()
                     try:
-                        fix = getattr(fixes, code)
-                    except AttributeError:
+                        line = error.correct(line)
+                    except ValueError:
                         print "No known solution."
-                        swp.write(line)
                     else:
                         print repr(line)
-                        fixed = fix(line)
-                        print repr(fixed)
-                        swp.write(fixed)
+                    swp.write(line)
 
 
 def main():
