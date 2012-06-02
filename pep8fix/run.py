@@ -64,41 +64,48 @@ def parse_error(line):
     return Error(filename, line, cursor, code, msg)
 
 
-def fix_file(filename, errors):
-    """Fix all the errors in a file."""
+def correct_file(filename, errors):
+    """Generate the corrected file by fixing each of the errors."""
     line_errors = dict((error.line, error) for error in errors)
-    with swap(filename) as swp:
-        with open(filename, 'r') as f:
-            for i, line in enumerate(f):
-                # Is there an error on this line?
+    with open(filename, 'r') as f:
+        for i, line in enumerate(f):
+            # Is there an error on this line?
+            try:
+                error = line_errors[i + 1]
+            except KeyError:
+                yield line
+            else:
+                print error
+                print repr(line)
+                # Can we fix it?
                 try:
-                    error = line_errors[i + 1]
-                except KeyError:
-                    swp.write(line)
+                    line = error.correct(line)
+                except ValueError:
+                    print "No known solution."
                 else:
-                    print error
                     print repr(line)
-                    # Can we fix it?
-                    try:
-                        line = error.correct(line)
-                    except ValueError:
-                        print "No known solution."
-                    else:
-                        print repr(line)
-                    swp.write(line)
+                yield line
 
 
-def main():
-    # Group errors by file
+def group_errors(errors):
+    """Group the errors by filename."""
     file_errors = defaultdict(list)
-    for line in sys.stdin:
+    for line in errors:
         error = parse_error(line)
         file_errors[error.filename].append(error)
+    return file_errors
+
+
+def main(pep8out=sys.stdin):
+    file_errors = group_errors(pep8out)
 
     # Fix files
     for filename, errors in file_errors.iteritems():
-        fix_file(filename, errors)
+        with swap(filename) as swp:
+            for line in correct_file(filename, errors):
+                swp.write(line)
 
+    # TODO: Change this code to be meaningful
     return 0
 
 if __name__ == "__main__":
