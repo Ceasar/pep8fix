@@ -1,29 +1,18 @@
 from functools import wraps
 import re
+import tokenize
 
 import pep8
+
+def _iden(x):
+    yield x
 
 
 def e225(line, cursor):
     """fixes missing whitespace around operator."""
     # iterate through operators in reverse length order
-    for operator in sorted(pep8.OPERATORS, reverse=True, key=lambda o: len(o)):
-        escaped = re.escape(operator)
-        pattern = "(\S)(%s)(\S)" % (escaped)
-        match = re.search(pattern, line)
-        if match is None:
-            pattern_l = "(\S)(%s)" % escaped
-            pattern_r = "(%s)(\S)" % escaped
-            match_l = re.search(pattern_l, line)
-            match_r = re.search(pattern_r, line)
-            match = match_l or match_r
-            if match is not None:
-                return line.replace(match.group(), "%s %s" % match.groups())
-            else:
-                continue
-        else:
-            return line.replace(match.group(), "%s %s %s" % match.groups())
-    raise ValueError("No operator found! '%s'" % line)
+    tokens = tokenize.generate_tokens(_iden(line).next)
+    return ' '.join(token for _, token, _, _, _ in tokens)
 
 
 def e231(line, cursor):
@@ -34,14 +23,13 @@ def e231(line, cursor):
 
 def e261(line, cursor):
     """fixes at least two spaces before inline comment"""
-    i = line.rfind("#")
-    return line[:i] + " " + line[i:]
+    return line[:cursor].rstrip() + "  " + line[cursor:]
 
 
 def e262(line, cursor):
     """fixes inline comment should start with '# '"""
-    i = line.rfind("#") + 1
-    return line[:i] + " " + line[i:]
+    i = cursor + 1
+    return line[:i] + " " + line[i:].lstrip()
 
 
 def e302(line, cursor):
