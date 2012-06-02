@@ -30,7 +30,7 @@ class Error(object):
 def parse_location(location):
     """Parse an error location.
     >>> parse_location("examples/turtleprocess.py:28:22:")
-    'examples/turtleprocess.py', 28, 22
+    ('examples/turtleprocess.py', 28, 22)
     """
     tokens = location.split(":")
     filename, line, cursor = tokens[0], int(tokens[1]), None
@@ -45,7 +45,17 @@ def parse_location(location):
 
 def parse_error(line):
     """Parse an error message.
-    >>> parse_error('test.py:5:8: E225 missing whitespace around operator')
+    >>> e = parse_error('test.py:5:8: E225 missing whitespace around operator')
+    >>> e.filename
+    'test.py'
+    >>> e.line
+    5
+    >>> e.cursor
+    8
+    >>> e.code
+    'E225'
+    >>> e.msg
+    'missing whitespace around operator'
     """
     tokens = line.split()
     location, code = tokens[0], tokens[1]
@@ -92,4 +102,5 @@ def main():
     return 0
 
 if __name__ == "__main__":
-    sys.exit(main())
+    import doctest
+    doctest.testmod()
