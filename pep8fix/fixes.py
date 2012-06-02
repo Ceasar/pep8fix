@@ -7,7 +7,7 @@ import pep8
 def e225(line, cursor):
     """fixes missing whitespace around operator."""
     # iterate through operators in reverse length order
-    for operator in sorted(pep8.OPERATORS, reverse=True):
+    for operator in sorted(pep8.OPERATORS, reverse=True, key=lambda o: len(o)):
         escaped = re.escape(operator)
         pattern = "(\S)(%s)(\S)" % (escaped)
         match = re.search(pattern, line)

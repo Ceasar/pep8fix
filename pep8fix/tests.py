@@ -16,10 +16,52 @@ class TestE225(Pep8FixTester):
     code = 'E225'
 
     def test_cases(self):
+        # unary operator
         yield self.oracle, "1+2", "1 + 2"
         yield self.oracle, "1 +2", "1 + 2"
         yield self.oracle, "1+ 2", "1 + 2"
+
+        # binary operator
         yield self.oracle, "1==2", "1 == 2"
+        yield self.oracle, "1 ==2", "1 == 2"
+        yield self.oracle, "1== 2", "1 == 2"
+
+        # unary operators
+        yield self.oracle, "1>>2", "1 >> 2"
+        yield self.oracle, "1**2", "1 ** 2"
+        yield self.oracle, "1*2", "1 * 2"
+        yield self.oracle, "1+2", "1 + 2"
+        yield self.oracle, "1-2", "1 - 2"
+
+        # binary operators
+        yield self.oracle, "1**=2", "1 **= 2"
+        yield self.oracle, "1*=2", "1 *= 2"
+        yield self.oracle, "1>2", "1 - 2"
+        yield self.oracle, "1+=2", "1 += 2"
+        yield self.oracle, "1-=2", "1 -= 2"
+        yield self.oracle, "1!=2", "1 != 2"
+        yield self.oracle, "1<>2", "1 <> 2"
+        yield self.oracle, "1%=2", "1 %= 2"
+        yield self.oracle, "1^=2", "1 ^= 2"
+        yield self.oracle, "1&=2", "1 &= 2"
+        yield self.oracle, "1|=2", "1 |= 2"
+        yield self.oracle, "1==2", "1 == 2"
+        yield self.oracle, "1/=2", "1 /= 2"
+        yield self.oracle, "1//=2", "1 //= 2"
+        yield self.oracle, "1<=2", "1 <= 2"
+        yield self.oracle, "1>=2", "1 >= 2"
+        yield self.oracle, "1<<=2", "1 <<= 2"
+        yield self.oracle, "1>>=2", "1 >>= 2"
+        yield self.oracle, "1%2", "1 % 2"
+        yield self.oracle, "1^2", "1 ^ 2"
+        yield self.oracle, "1&2", "1 & 2"
+        yield self.oracle, "1|2", "1 | 2"
+        yield self.oracle, "1=2", "1 = 2"
+        yield self.oracle, "1/2", "1 / 2"
+        yield self.oracle, "1//2", "1 // 2"
+        yield self.oracle, "1<2", "1 < 2"
+        yield self.oracle, "1>2", "1 > 2"
+        yield self.oracle, "1<<2", "1 << 2"
 
 
 class TestE231(Pep8FixTester):
