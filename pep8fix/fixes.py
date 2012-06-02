@@ -4,47 +4,47 @@ import re
 import pep8
 
 
-def e225(line):
+def e225(line, cursor):
     """fixes missing whitespace around operator."""
     # iterate through operators in reverse length order
-    for operator in reversed(list(pep8.BINARY_OPERATORS)):
+    for operator in sorted(pep8.OPERATORS, reverse=True):
         escaped = re.escape(operator)
-        pattern = "(\S)(%s)(\S)" % re.escape(escaped)
+        pattern = "(\S)(%s)(\S)" % (escaped)
         match = re.search(pattern, line)
         if match is None:
-            pattern = "(\S)(%s)" % escaped
-            match = re.search(pattern, line)
-            if match is None:
-                match = re.search("(%s)(\S)" % (escaped), line)
-                if match is None:
-                    continue
-                else:
-                    return line.replace(match.group(), "%s %s" % match.groups())
-            else:
+            pattern_l = "(\S)(%s)" % escaped
+            pattern_r = "(%s)(\S)" % escaped
+            match_l = re.search(pattern_l, line)
+            match_r = re.search(pattern_r, line)
+            match = match_l or match_r
+            if match is not None:
                 return line.replace(match.group(), "%s %s" % match.groups())
+            else:
+                continue
         else:
             return line.replace(match.group(), "%s %s %s" % match.groups())
+    raise ValueError("No operator found! '%s'" % line)
 
 
-def e231(line):
+def e231(line, cursor):
     """fixes missing white space after ','"""
     tokens = re.split(",(\S)", line)
     return "".join(", ".join(tokens[i:i + 2]) for i in range(0, len(tokens), 2))
 
 
-def e261(line):
+def e261(line, cursor):
     """fixes at least two spaces before inline comment"""
     i = line.rfind("#")
     return line[:i] + " " + line[i:]
 
 
-def e262(line):
+def e262(line, cursor):
     """fixes inline comment should start with '# '"""
     i = line.rfind("#") + 1
     return line[:i] + " " + line[i:]
 
 
-def e302(line):
+def e302(line, cursor):
     """fixes expected 2 lines, found 1."""
     return "\n" + line
 
@@ -64,17 +64,17 @@ def e701(line):
 '''
 
 
-def w191(line):
+def w191(line, cursor):
     """fixes W191 indentation contains tabs."""
     return line.expandtabs()
 
 
-def w291(line):
+def w291(line, cursor):
     """fixes trailing whitespace."""
     return line.rstrip() + "\n"
 
 
-def w293(line):
+def w293(line, cursor):
     """fixes blank line contains whitespace."""
     return "\n"
 

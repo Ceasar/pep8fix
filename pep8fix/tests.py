@@ -8,7 +8,7 @@ class Pep8FixTester(object):
         pass
 
     def oracle(self, given, expected):
-        observed = getattr(fixes, self.code.lower())(given)
+        observed = getattr(fixes, self.code.lower())(given, 0)
         assert_equal(observed, expected)
 
 

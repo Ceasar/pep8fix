@@ -19,7 +19,7 @@ class Error(object):
     def correct(self, line):
         """Correct the mistake on the line."""
         try:
-            return getattr(fixes, self.code.lower())(line)
+            return getattr(fixes, self.code.lower())(line, self.cursor)
         except AttributeError:
             raise ValueError("No solution known.")
 
