@@ -1,117 +1,97 @@
+import tokenize
+
 from nose.tools import assert_equal
+import pep8
 
 import fixes
 
 
+# hack to generate tokens
+# TODO: See if there is a better way to do this
+def iden(x):
+    yield x
+
+
 class Pep8FixTester(object):
-    def test_cases(self):
-        pass
+    oracle = None  # pep8 checker
 
-    def oracle(self, given, expected):
-        observed = getattr(fixes, self.code.lower())(given, 0)
-        assert_equal(observed, expected)
+    def tokenize(self, line):
+        return tokenize.generate_tokens(iden(line).next)
 
+    def ask(self, line, *args):
+        oracle = getattr(pep8, self.oracle)
 
-class TestE225(Pep8FixTester):
-    code = 'E225'
-
-    def test_cases(self):
-        # unary operator
-        yield self.oracle, "1+2", "1 + 2"
-        yield self.oracle, "1 +2", "1 + 2"
-        yield self.oracle, "1+ 2", "1 + 2"
-
-        # binary operator
-        yield self.oracle, "1==2", "1 == 2"
-        yield self.oracle, "1 ==2", "1 == 2"
-        yield self.oracle, "1== 2", "1 == 2"
-
-        # unary operators
-        yield self.oracle, "1>>2", "1 >> 2"
-        yield self.oracle, "1**2", "1 ** 2"
-        yield self.oracle, "1*2", "1 * 2"
-        yield self.oracle, "1+2", "1 + 2"
-        yield self.oracle, "1-2", "1 - 2"
-
-        # binary operators
-        yield self.oracle, "1**=2", "1 **= 2"
-        yield self.oracle, "1*=2", "1 *= 2"
-        yield self.oracle, "1>2", "1 - 2"
-        yield self.oracle, "1+=2", "1 += 2"
-        yield self.oracle, "1-=2", "1 -= 2"
-        yield self.oracle, "1!=2", "1 != 2"
-        yield self.oracle, "1<>2", "1 <> 2"
-        yield self.oracle, "1%=2", "1 %= 2"
-        yield self.oracle, "1^=2", "1 ^= 2"
-        yield self.oracle, "1&=2", "1 &= 2"
-        yield self.oracle, "1|=2", "1 |= 2"
-        yield self.oracle, "1==2", "1 == 2"
-        yield self.oracle, "1/=2", "1 /= 2"
-        yield self.oracle, "1//=2", "1 //= 2"
-        yield self.oracle, "1<=2", "1 <= 2"
-        yield self.oracle, "1>=2", "1 >= 2"
-        yield self.oracle, "1<<=2", "1 <<= 2"
-        yield self.oracle, "1>>=2", "1 >>= 2"
-        yield self.oracle, "1%2", "1 % 2"
-        yield self.oracle, "1^2", "1 ^ 2"
-        yield self.oracle, "1&2", "1 & 2"
-        yield self.oracle, "1|2", "1 | 2"
-        yield self.oracle, "1=2", "1 = 2"
-        yield self.oracle, "1/2", "1 / 2"
-        yield self.oracle, "1//2", "1 // 2"
-        yield self.oracle, "1<2", "1 < 2"
-        yield self.oracle, "1>2", "1 > 2"
-        yield self.oracle, "1<<2", "1 << 2"
+        location, msg = oracle(line, *args)
+        try:
+            _, cursor = location
+        except TypeError:
+            cursor = location
+        code, _ = msg.split(None, 1)
+        fixed = getattr(fixes, code.lower())(line, cursor)
+        assert_equal(oracle(fixed, *args), None)
 
 
-class TestE231(Pep8FixTester):
-    code = 'E231'
+class TestMissingWhitespaceAroundOperator(Pep8FixTester):
+    oracle = 'missing_whitespace_around_operator'
 
-    def test_cases(self):
-        yield self.oracle, '[1,2]', '[1, 2]'
-        yield self.oracle, '[1,2,3]', '[1, 2, 3]'
-        yield self.oracle, '[1,2]  # [1,2]', '[1, 2]  # [1,2]'
-
-
-class TestE261(Pep8FixTester):
-    code = 'E261'
-
-    def test_cases(self):
-        yield self.oracle, "1 + 2# s", "1 + 2  # s"
-        yield self.oracle, "1 + 2 # s", "1 + 2  # s"
-        yield self.oracle, "'s #s' # s", "'s #s'  # s"
-        yield self.oracle, "1 + 2# s#s", "1 + 2  # s#s#"
-
-
-class TestE262(Pep8FixTester):
-    code = 'E262'
-
-    def test_cases(self):
-        yield self.oracle, "1 + 2  #s", "1 + 2  # s"
-        yield self.oracle, "'#s'  #s", "'#s'  # s"
-        yield self.oracle, "1 + 2  #s#", "1 + 2  # s#"
+    def test_e225(self):
+        for op in pep8.OPERATORS:
+            line = "1%s2" % op
+            yield self.ask, line, self.tokenize(line)
+            line = "1 %s2" % op
+            yield self.ask, line, self.tokenize(line)
+            line = "1%s 2" % op
+            yield self.ask, line, self.tokenize(line)
+        lines = [
+                'i=i+1',
+                'submitted +=1',
+                'x = x*2 - 1',
+                'hypot2 = x*x + y*y',
+                'c = alpha -4',
+                'z = x **y'
+                ]
+        for line in lines:
+            yield self.ask, line, self.tokenize(line)
 
 
-class TestE302(Pep8FixTester):
-    code = 'E302'
+class TestMissingWhitespace(Pep8FixTester):
+    oracle = 'missing_whitespace'
 
-    def test_cases(self):
-        yield self.oracle, "\n", "\n\n"
-
-
-class TestW191(Pep8FixTester):
-    code = 'W191'
+    def test_e231(self):
+        yield self.ask, "['a','b']"
+        yield self.ask, "foo(bar,baz)"
 
 
-class TestW291(Pep8FixTester):
-    code = 'W291'
+class TestWhiteSpaceBeforeInlineComment(Pep8FixTester):
+    oracle = 'whitespace_before_inline_comment'
 
-    def test_cases(self):
-        yield self.oracle, "a = 1 \n", "a = 1\n"
+    def test_e261(self):
+        lines = ["x = x + 1 # Increment x"]
+        for line in lines:
+            yield self.ask, line, self.tokenize(line)
+
+    def test_262(self):
+        lines = ["x = x + 1  #Increment x", "x = x + 1  #  Increment x"]
+        for line in lines:
+            yield self.ask, line, self.tokenize(line)
 
 
-class TestW293(Pep8FixTester):
-    code = 'W293'
+class TestBlankLines(Pep8FixTester):
+    oracle = 'blank_lines'
 
-    def test_cases(self):
-        yield self.oracle, " \n", "\n"
+    def test_e302(self):
+        yield self.ask, "\n"
+
+
+class TestTabsObsolete(Pep8FixTester):
+    oracle = 'tabs_obsolete'
+
+
+class TestTrailingWhitespace(Pep8FixTester):
+    oracle = 'trailing_whitespace'
+
+    def test_w291(self):
+        yield self.ask, "a = 1 \n"
+
+    def test_w293(self):
+        yield self.ask, " \n"
